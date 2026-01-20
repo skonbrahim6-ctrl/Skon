@@ -1,30 +1,34 @@
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from config import START_VIDEO, SUPPORT_USER, BOT_USERNAME
+from config import START_VIDEO, SUPPORT_USER, BOT_USERNAME, BOT_NAME
 
 @Client.on_message(filters.command("start") & filters.private)
 async def start(client, message):
     text = f"""
-<b>✧━━━━━━━━━━━━━━✧</b>
-<b> 𝐒𝐏𝐎𝐓𝐈 𝐌𝐔𝐒𝐈𝐂 🎶 </b>
-<b>✧━━━━━━━━━━━━━━✧</b>
+<b>─── • ◈ • ───</b>
+<b>🎸 𝐖𝐄𝐋𝐂𝐎𝐌𝐄 𝐓𝐎 {BOT_NAME} 🎸</b>
+<b>─── • ◈ • ───</b>
 
-<b>أهلاً بك يا {message.from_user.mention} في عالم الموسيقى الفخم..</b>
+<b>أهلاً بك يا {message.from_user.mention} في أقوى بوت ميوزك على التيليجرام ✨</b>
 
-<b>أنـا بوت {BOT_USERNAME}.. أقوى وأسرع مشغل موسيقى في التيليجرام ⚡️</b>
+<b>🚀 مميزات البوت:</b>
+<b>• تشغيل فوري بجودة 320kbps 🔊</b>
+<b>• دعم كامل للمجموعات والقنوات 🛡</b>
+<b>• نظام بحث ذكي من يوتيوب وسبوتيفاي 🔍</b>
+<b>• حماية كاملة وتشغيل مستمر 24/7 💎</b>
 
-<b>• أستطيع تشغيل الأغاني والڤيديوهات بجودة عالية 🔊</b>
-<b>• أدعم القنوات والمجموعات بدون انقطاع 🛡</b>
-<b>• تم تطويري بأحدث التقنيات البرمجية لتجربة استماع لا مثيل لها 💎</b>
-
-<b>اسـتمر في اكتشاف الفخامة عبر الأزرار أدناه 👇</b>
+<b>اسـتخدم الأزرار بالأسفل لاستكشاف البوت 👇</b>
 """
     buttons = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("ضيف البوت لمجموعتك ✨", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
+            InlineKeyboardButton("➕ أضف البوت لمجموعتك ➕", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
         ],
         [
-            InlineKeyboardButton("𝐃𝐞𝐯 👑", url=f"https://t.me/C_R_B_X")
+            InlineKeyboardButton("👑 𝐃𝐞𝐯", url=f"https://t.me/{SUPPORT_USER}"),
+            InlineKeyboardButton("📊 𝐒𝐭𝐚𝐭𝐬", callback_data="stats")
+        ],
+        [
+            InlineKeyboardButton("🎵 قناة السورس", url="https://t.me/C_R_B_X")
         ]
     ])
     
@@ -33,4 +37,4 @@ async def start(client, message):
         caption=text,
         reply_markup=buttons
     )
-  
+    
