@@ -1,10 +1,8 @@
 pyrogram
 tgcrypto
 pytgcalls
+ntgcalls
 yt-dlp
 ffmpeg-python
 python-dotenv
 motor
-requests
-aiohttp
-aiofiles
