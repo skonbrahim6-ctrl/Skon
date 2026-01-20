@@ -1,3 +1,4 @@
+# نظام الطابور لإدارة تشغيل الأغاني
 queue = {}
 
 def add_to_queue(chat_id, title, url, user):
@@ -14,4 +15,4 @@ def get_queue(chat_id):
 def clear_queue(chat_id):
     if chat_id in queue:
         queue.pop(chat_id)
-      
+                  
