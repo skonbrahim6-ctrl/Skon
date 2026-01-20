@@ -6,3 +6,7 @@ yt-dlp
 ffmpeg-python
 python-dotenv
 motor
+requests
+aiohttp
+aiofiles
+Pillow
