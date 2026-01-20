@@ -4,3 +4,5 @@ pytgcalls==2.0.0.dev22
 yt-dlp
 ffmpeg-python
 python-dotenv
+motor
+Pillow
