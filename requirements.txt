@@ -1,11 +1,10 @@
 pyrogram
 tgcrypto
-pytgcalls==0.8.2
+pytgcalls
 yt-dlp
 ffmpeg-python
 python-dotenv
 motor
-Pillow
 requests
 aiohttp
 aiofiles
