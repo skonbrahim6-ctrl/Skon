@@ -1,10 +1,10 @@
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+# استيراد الإعدادات من ملف config
 from config import START_VIDEO, SUPPORT_USER, BOT_NAME
 
 @Client.on_message(filters.command("start") & filters.private)
 async def start(client, message):
-    # جلب يوزر البوت تلقائياً لضمان عمل رابط الإضافة
     bot_me = await client.get_me()
     bot_username = bot_me.username
     
@@ -24,7 +24,6 @@ async def start(client, message):
 <b>اسـتخدم الأزرار بالأسفل لاستكشاف البوت 👇</b>
 """
 
-    # هنا جعلنا كل زر في قائمة مستقلة [ ] لكي يظهر تحت الآخر
     buttons = InlineKeyboardMarkup([
         [InlineKeyboardButton("➕ أضف البوت لمجموعتك ➕", url=f"https://t.me/{bot_username}?startgroup=true")],
         [InlineKeyboardButton("👑 المطور (𝐃𝐞𝐯)", url=f"https://t.me/{SUPPORT_USER}")],
@@ -32,18 +31,18 @@ async def start(client, message):
         [InlineKeyboardButton("🎵 قناة السورس", url="https://t.me/C_R_B_X")]
     ])
     
+    # محاولة إرسال الفيديو
     try:
-        # إرسال الفيديو مع النص والأزرار تحت بعضها
         await message.reply_video(
-            video=START_VIDEO,
+            video=START_VIDEO, # هذا هو السطر المسؤول عن إرسال الفيديو
             caption=text,
             reply_markup=buttons
         )
     except Exception as e:
-        # حل احتياطي إذا فشل الفيديو
+        # إذا فشل إرسال الفيديو (بسبب الرابط)، سيرسل النص والأزرار فقط
         await message.reply_text(
             text=text,
             reply_markup=buttons
         )
-        print(f"Error: {e}")
+        print(f"خطأ في إرسال الفيديو: {e}")
         
