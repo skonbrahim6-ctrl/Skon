@@ -4,23 +4,37 @@ from yt_dlp import YoutubeDL
 
 @Client.on_inline_query()
 async def inline_search(client, query):
-    string = query.query.lower()
-    if string == "":
+    text = query.query.strip().lower()
+    if not text:
         return
     
     results = []
-    with YoutubeDL({"format": "bestaudio/best", "quiet": True}) as ydl:
-        videos = ydl.extract_info(f"ytsearch10:{string}", download=False)['entries']
-        
-        for video in videos:
-            results.append(
-                InlineQueryResultArticle(
-                    title=video['title'],
-                    input_message_content=InputTextMessageContent(f"/play {video['webpage_url']}"),
-                    description=f"قناة: {video['uploader']}\nمدة: {video['duration_string']}",
-                    thumb_url=video['thumbnail']
-                )
-            )
+    # إعدادات بحث سريعة جداً بدون تحميل
+    ydl_opts = {
+        "format": "bestaudio/best",
+        "quiet": True,
+        "no_warnings": True,
+        "extract_flat": True, # تسريع البحث بجلب الروابط فقط
+    }
+    
+    try:
+        with YoutubeDL(ydl_opts) as ydl:
+            # البحث عن أول 10 نتائج
+            videos = ydl.extract_info(f"ytsearch10:{text}", download=False)['entries']
             
-    await query.answer(results=results, cache_time=1)
-  
+            for video in videos:
+                results.append(
+                    InlineQueryResultArticle(
+                        title=video.get('title', 'بدون عنوان'),
+                        description=f"📺 القناة: {video.get('uploader', 'غير معروف')}\n🔗 اضغط للإرسال والتحميل",
+                        thumb_url=video.get('thumbnail'),
+                        input_message_content=InputTextMessageContent(
+                            f"/play {video.get('url') or video.get('webpage_url')}"
+                        )
+                    )
+                )
+        
+        await query.answer(results=results, cache_time=300) # كاش لمدة 5 دقائق لتوفير الإنترنت
+    except Exception as e:
+        print(f"Inline Error: {e}")
+            
