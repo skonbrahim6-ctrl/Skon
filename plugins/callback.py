@@ -6,16 +6,18 @@ async def callbacks(client, query):
     data = query.data
     
     if data == "pause":
-        # هنا يتم استدعاء أمر الإيقاف المؤقت من المكتبة
-        await query.answer("⏸ تم الإيقاف المؤقت")
-        await query.edit_message_caption(caption=f"<b>⏸ تم إيقاف التشغيل مؤقتاً\n💎 بواسطة: {BOT_NAME}</b>")
+        # في نظام الملفات، لا يمكننا عمل Pause للملف المرسل، لذا سنخبر المستخدم بذلك
+        await query.answer("⚠️ هذا الزر مخصص لنظام المكالمات فقط.", show_alert=True)
         
     elif data == "resume":
-        await query.answer("▶️ تم الاستئناف")
-        await query.edit_message_caption(caption=f"<b>▶️ تم استئناف التشغيل\n💎 بواسطة: {BOT_NAME}</b>")
+        await query.answer("⚠️ هذا الزر مخصص لنظام المكالمات فقط.", show_alert=True)
         
     elif data == "stop":
-        await query.answer("⏹ تم الإيقاف")
+        # حذف رسالة التحكم
+        await query.answer("⏹ تم إغلاق القائمة")
         await query.message.delete()
-        await query.message.reply_text("<b>⏹ تم إنهاء التشغيل ومغادرة المكالمة.</b>")
-      
+        
+    elif data == "close":
+        await query.message.delete()
+        await query.answer("❌ تم الإغلاق")
+        
