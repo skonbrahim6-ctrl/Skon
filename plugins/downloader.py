@@ -1,58 +1,47 @@
 import os
-import asyncio
+import yt_dlp
 from pyrogram import Client, filters
-from yt_dlp import YoutubeDL
+from config import DOWNLOAD_DIRECTORY
 
-# إعدادات متقدمة لتحميل أسرع في تيرميكس
-YDL_OPTIONS = {
-    'format': 'bestaudio/best',
-    'outtmpl': 'downloads/%(title)s.%(ext)s',
-    'postprocessors': [{
-        'key': 'FFmpegExtractAudio',
-        'preferredcodec': 'mp3',
-        'preferredquality': '192',
-    }],
-    'quiet': True,
-    'no_warnings': True,
-}
+# التأكد من وجود المجلد
+if not os.path.exists(DOWNLOAD_DIRECTORY):
+    os.makedirs(DOWNLOAD_DIRECTORY)
 
-@Client.on_message(filters.command(["download", "تحميل"]))
-async def download_song(client, message):
+@Client.on_message(filters.command(["download", "video"]) & filters.private)
+async def download_video(client, message):
     if len(message.command) < 2:
-        return await message.reply_text("<b>❌ يرجى كتابة اسم الأغنية أو رابط اليوتيوب!</b>")
-    
-    query = " ".join(message.command[1:])
-    m = await message.reply_text(f"<b>📥 جاري معالجة طلبك:</b> <code>{query}</code>")
-    
-    try:
-        with YoutubeDL(YDL_OPTIONS) as ydl:
-            # استخراج المعلومات والتحميل
-            info = ydl.extract_info(f"ytsearch:{query}" if not query.startswith("http") else query, download=True)
-            if 'entries' in info:
-                info = info['entries'][0]
-            
-            # تحديد المسار الصحيح للملف بعد التحويل لـ MP3
-            file_path = ydl.prepare_filename(info).rsplit(".", 1)[0] + ".mp3"
-            title = info.get('title', 'Unknown')
-            uploader = info.get('uploader', 'Unknown')
-            duration = info.get('duration', 0)
+        return await message.reply_text("<b>❌ أرسل رابط الفيديو بعد الأمر، مثال:</b>\n`/video https://youtu.be/...`")
 
-        await m.edit("<b>📤 جاري الرفع إلى تليجرام...</b>")
-        
-        await message.reply_audio(
-            audio=file_path, 
-            title=title, 
-            performer=uploader,
-            duration=int(duration),
-            caption=f"<b>✅ تم التحميل بنجاح</b>\n<b>🎵 العنوان:</b> <code>{title}</code>"
+    url = message.text.split(None, 1)[1]
+    msg = await message.reply_text("<b>⏳ جاري معالجة الرابط وتحميل الفيديو...</b>")
+
+    try:
+        # إعدادات التحميل
+        ydl_opts = {
+            'format': 'best',
+            'outtmpl': f'{DOWNLOAD_DIRECTORY}%(title)s.%(ext)s',
+            'noplaylist': True,
+        }
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            file_path = ydl.prepare_filename(info)
+            title = info.get('title', 'video')
+
+        await msg.edit("<b>✅ اكتمل التحميل.. جاري الرفع إلى تيليجرام 🚀</b>")
+
+        # إرسال الفيديو للمستخدم
+        await message.reply_video(
+            video=file_path,
+            caption=f"<b>🎬 تم التحميل بنجاح:</b>\n`{title}`"
         )
-        
-        await m.delete()
-        
-        # التأكد من حذف الملف بعد الإرسال لتوفير مساحة الهاتف
+
+        # مسح الملف من تيرميكس لتوفير المساحة
         if os.path.exists(file_path):
             os.remove(file_path)
             
+        await msg.delete()
+
     except Exception as e:
-        await m.edit(f"<b>❌ حدث خطأ غير متوقع:</b>\n<code>{str(e)}</code>")
-            
+        await msg.edit(f"<b>❌ حدث خطأ أثناء التحميل:</b>\n`{str(e)}`")
+    
